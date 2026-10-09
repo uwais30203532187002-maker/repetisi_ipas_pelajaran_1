@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPAS Interaktif - Sistem Pencernaan & Nutrisi Tubuh</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Plus Jakarta Sans for kid-friendly legibility -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            green: '#0D9488',
+                            lightgreen: '#CCFBF1',
+                            amber: '#F59E0B',
+                            lightamber: '#FEF3C7',
+                            blue: '#0284C7',
+                            lightblue: '#E0F2FE',
+                            purple: '#7C3AED',
+                            pink: '#DB2777'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F0F9FF;
+        }
+        h1, h2, h3, .font-fun {
+            font-family: 'Fredoka', cursive;
+        }
+        .organ-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .organ-card:hover {
+            transform: translateY(-6px) scale(1.02);
+        }
+        .animate-bounce-slow {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .pulse-subtle {
+            animation: pulse 2.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.92; transform: scale(1.03); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E0F2FE;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0284C7;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between selection:bg-teal-200">
+
+    <!-- HEADER NAVBAR -->
+    <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-2 rounded-2xl shadow-inner text-emerald-600 text-2xl sm:text-3xl font-bold flex items-center justify-center w-12 h-12">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <span class="bg-amber-400 text-amber-950 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Materi IPAS Interaktif</span>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-wide leading-tight">Sistem Pencernaan & Nutrisi Tubuh</h1>
+                    <p class="text-xs text-emerald-100 hidden sm:block">MIS Al Jihad Palangka Raya & Kelas VI SD</p>
+                </div>
+            </div>
+
+            <!-- Global Action Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="ttsToggleBtn" onclick="toggleAudioSpeech()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition border border-white/30" title="Suara Pengajar">
+                    <i id="ttsIcon" class="fa-solid fa-volume-high text-amber-300 text-base"></i>
+                    <span id="ttsText" class="hidden md:inline">Suara: ON</span>
+                </button>
+                <div class="bg-amber-400/90 text-amber-950 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow">
+                    <i class="fa-solid fa-star text-amber-700"></i>
+                    <span id="globalStars">0 Poin</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <nav class="bg-emerald-800/40 border-t border-white/10 px-4">
+            <div class="max-w-7xl mx-auto flex overflow-x-auto space-x-2 py-2 text-sm no-scrollbar">
+                <button onclick="switchTab('pencernaan')" id="tab-pencernaan" class="nav-btn px-4 py-2 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap bg-white text-emerald-800 shadow">
+                    <i class="fa-solid fa-person-digging"></i> 1. Sistem Pencernaan
+                </button>
+                <button onclick="switchTab('zatgizi')" id="tab-zatgizi" class="nav-btn px-4 py-2 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap hover:bg-white/10 text-white">
+                    <i class="fa-solid fa-utensils"></i> 2. 6 Zat Makanan
+                </button>
+                <button onclick="switchTab('vitamin')" id="tab-vitamin" class="nav-btn px-4 py-2 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap hover:bg-white/10 text-white">
+                    <i class="fa-solid fa-capsules"></i> 3. Panduan Vitamin (A-K)
+                </button>
+                <button onclick="switchTab('kuis')" id="tab-kuis" class="nav-btn px-4 py-2 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap bg-amber-400 text-amber-950 hover:bg-amber-300">
+                    <i class="fa-solid fa-gamepad"></i> 4. Kuis & Sertifikat
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- AUDIO NARRATION STATUS BANNER -->
+    <div id="audioStatusBanner" class="hidden bg-amber-100 border-b border-amber-300 px-4 py-2 text-amber-900 text-xs sm:text-sm flex justify-between items-center max-w-7xl mx-auto mt-2 rounded-xl shadow-sm">
+        <div class="flex items-center gap-2">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+            </span>
+            <span id="audioPlayingText">Membacakan penjelasan...</span>
+        </div>
+        <button onclick="stopAudioSpeech()" class="text-xs bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold px-2 py-1 rounded-lg">
+            <i class="fa-solid fa-circle-stop mr-1"></i> Hentikan Suara
+        </button>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-grow w-full">
+
+        <!-- TAB 1: SISTEM PENCERNAAN -->
+        <section id="sec-pencernaan" class="tab-content block space-y-6">
+            <!-- Header Banner -->
+            <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-3 z-10 max-w-2xl">
+                    <span class="bg-amber-300 text-amber-950 text-xs font-black px-3 py-1 rounded-full uppercase">IPAS Kelas VI SD / MI</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold leading-snug">Begini Cara Kerja Sistem Pencernaan Kita!</h2>
+                    <p class="text-emerald-50 text-sm sm:text-base">
+                        Makanan yang kita makan diolah oleh organ pencernaan dari mulut hingga anus agar nutrisinya dapat diserap tubuh menjadi energi!
+                    </p>
+                    <button onclick="speakText('Selamat datang di materi Sistem Pencernaan! Makanan yang kita makan diolah oleh organ pencernaan mulai dari mulut hingga anus agar nutrisinya diserap tubuh menjadi energi. Klik pada organ di bawah ini untuk mempelajari prosesnya!')" class="bg-white text-emerald-700 hover:bg-emerald-50 font-bold px-4 py-2.5 rounded-2xl text-sm shadow-md flex items-center gap-2 transition">
+                        <i class="fa-solid fa-circle-play text-emerald-600 text-lg"></i> Dengarkan Pengantar
+                    </button>
+                </div>
+                <!-- Banner Mascot SVG -->
+                <div class="w-36 h-36 sm:w-48 sm:h-48 flex-shrink-0 bg-white/10 backdrop-blur-md rounded-full p-4 border-2 border-white/20 flex items-center justify-center">
+                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
+                        <circle cx="100" cy="100" r="80" fill="#FEF08A"/>
+                        <circle cx="75" cy="85" r="10" fill="#1E293B"/>
+                        <circle cx="125" cy="85" r="10" fill="#1E293B"/>
+                        <path d="M 65 125 Q 100 160 135 125" fill="none" stroke="#1E293B" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M 85 70 Q 75 60 65 70" fill="none" stroke="#1E293B" stroke-width="4"/>
+                        <path d="M 115 70 Q 125 60 135 70" fill="none" stroke="#1E293B" stroke-width="4"/>
+                        <circle cx="55" cy="110" r="12" fill="#F87171" opacity="0.6"/>
+                        <circle cx="145" cy="110" r="12" fill="#F87171" opacity="0.6"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Interactive Digestive Path Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left: Interactive Organ List -->
+                <div class="lg:col-span-1 space-y-3">
+                    <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-route text-emerald-600"></i> Alur Perjalanan Makanan
+                    </h3>
+                    <p class="text-xs text-slate-500">Klik organ untuk melihat detail & mendengarkan suara:</p>
+
+                    <div class="space-y-2" id="organButtonsList">
+                        <!-- Organ items dynamically generated -->
+                    </div>
+                </div>
+
+                <!-- Right: Detailed Organ Interactive View -->
+                <div class="lg:col-span-2">
+                    <div id="organDetailBox" class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-emerald-100 min-h-[420px] flex flex-col justify-between relative">
+                        <!-- Content dynamically loaded -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: 6 ZAT MAKANAN -->
+        <section id="sec-zatgizi" class="tab-content hidden space-y-6">
+            <!-- Banner -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="bg-amber-300 text-amber-950 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Pedoman Makanan Seimbang</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold mt-2">Zat Makanan Yang Diperlukan Tubuh</h2>
+                    <p class="text-blue-100 text-sm mt-1">Makan seimbang agar tubuh sehat, kuat, dan prestasi meningkat!</p>
+                </div>
+                <button onclick="speakText('Zat makanan yang diperlukan tubuh ada 6 jenis utama: Karbohidrat, Protein, Lemak, Vitamin, Mineral, dan Air. Semua zat ini memiliki fungsi penting bagi tubuh kita!')" class="bg-white text-blue-800 hover:bg-blue-50 font-bold px-4 py-2.5 rounded-2xl text-sm shadow flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-volume-high text-blue-600 text-lg"></i> Putar Audio
+                </button>
+            </div>
+
+            <!-- 6 Nutrient Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="nutrientsGrid">
+                <!-- Nutrient Cards populated by JavaScript -->
+            </div>
+
+            <!-- Health Tips Footer Banner -->
+            <div class="bg-amber-100 border-2 border-amber-300 rounded-3xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-amber-400 rounded-2xl flex items-center justify-center text-amber-900 text-2xl font-bold flex-shrink-0">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-amber-950">Tips Tubuh Sehat Setiap Hari!</h4>
+                        <p class="text-xs sm:text-sm text-amber-800">1. Makan bergizi seimbang • 2. Minum air cukup • 3. Istirahat 8-10 jam • 4. Olahraga teratur & Jaga kebersihan</p>
+                    </div>
+                </div>
+                <button onclick="speakText('Tips tubuh sehat setiap hari: Pertama, konsumsi makanan bergizi seimbang. Kedua, minum air putih yang cukup. Ketiga, tidur cukup delapan hingga sepuluh jam setiap hari. Keempat, rutin berolahraga dan jaga kebersihan diri!')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition whitespace-nowrap">
+                    <i class="fa-solid fa-volume-low mr-1"></i> Dengarkan Tips
+                </button>
+            </div>
+        </section>
+
+        <!-- TAB 3: PANDUAN VITAMIN (A-K) -->
+        <section id="sec-vitamin" class="tab-content hidden space-y-6">
+            <!-- Header Banner -->
+            <div class="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="bg-yellow-300 text-yellow-950 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Rincian Lengkap Vitamin</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold mt-2">Vitamin yang Dibutuhkan Tubuh</h2>
+                    <p class="text-rose-100 text-sm mt-1">"Vitamin kecil, manfaat besar untuk hidup sehat dan pintar!"</p>
+                </div>
+                <button onclick="speakText('Vitamin yang dibutuhkan tubuh antara lain Vitamin A, Vitamin B Kompleks, Vitamin C, Vitamin D, Vitamin E, dan Vitamin K. Klik setiap kartu vitamin untuk pelajari manfaat dan sumber makanannya!')" class="bg-white text-purple-800 hover:bg-purple-50 font-bold px-4 py-2.5 rounded-2xl text-sm shadow flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-volume-high text-purple-600 text-lg"></i> Putar Audio
+                </button>
+            </div>
+
+            <!-- Vitamin Filter Buttons -->
+            <div class="flex flex-wrap gap-2 justify-center" id="vitaminFilterBtns">
+                <!-- Dynamic Buttons -->
+            </div>
+
+            <!-- Vitamin Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="vitaminsGrid">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- TAB 4: KUIS INTERAKTIF & SERTIFIKAT -->
+        <section id="sec-kuis" class="tab-content hidden space-y-6">
+            <!-- Quiz Card Section -->
+            <div id="quizStartView" class="bg-white rounded-3xl p-8 shadow-xl border-2 border-emerald-100 text-center max-w-2xl mx-auto space-y-6">
+                <div class="w-24 h-24 bg-gradient-to-tr from-amber-400 to-amber-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto shadow-lg animate-bounce-slow">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-800">Uji Pemahaman IPAS Siswa!</h2>
+                    <p class="text-slate-600 text-sm mt-2">Jawab 10 pertanyaan seru tentang Sistem Pencernaan, 6 Zat Makanan, dan Vitamin untuk mendapatkan **Sertifikat Kelulusan**!</p>
+                </div>
+
+                <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-200 text-left text-xs sm:text-sm text-emerald-900 space-y-2">
+                    <div class="flex items-center gap-2 font-bold text-emerald-800">
+                        <i class="fa-solid fa-circle-info text-base"></i> Ketentuan Kuis & Sertifikat:
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 pl-2">
+                        <li>Kuis berisi 10 soal pilihan ganda.</li>
+                        <li>Setiap jawaban benar bernilai 10 poin (Maksimal 100 Poin).</li>
+                        <li>Siswa yang lulus dapat mengunduh **Sertifikat Resmi Digital** dan mengumpulkannya ke Google Drive.</li>
+                    </ul>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="startQuiz()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-lg px-8 py-4 rounded-2xl shadow-lg transition transform hover:scale-105 flex items-center gap-3 mx-auto">
+                        <i class="fa-solid fa-play"></i> Mulai Kuis Sekarang
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz In-Progress Area -->
+            <div id="quizActiveView" class="hidden max-w-2xl mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-teal-100 space-y-6">
+                <!-- Progress Header -->
+                <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                    <div>
+                        <span class="text-xs font-bold text-teal-600 uppercase">Pertanyaan <span id="currentQuestionNum">1</span> dari 10</span>
+                        <div class="w-48 sm:w-64 bg-slate-100 h-3 rounded-full mt-1 overflow-hidden">
+                            <div id="quizProgressBar" class="bg-emerald-500 h-full w-10 transition-all duration-300"></div>
+                        </div>
+                    </div>
+                    <div class="bg-amber-100 text-amber-900 px-3 py-1 rounded-xl text-sm font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-star text-amber-500"></i> Score: <span id="quizScoreText">0</span>
+                    </div>
+                </div>
+
+                <!-- Question Text -->
+                <div class="space-y-3">
+                    <h3 id="quizQuestionText" class="text-lg sm:text-xl font-bold text-slate-800 leading-snug">
+                        Loading Soal...
+                    </h3>
+                    <button onclick="readCurrentQuestionAudio()" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-volume-high"></i> Bacakan Soal & Pilihan
+                    </button>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="quizOptionsContainer" class="space-y-3">
+                    <!-- Options buttons loaded dynamically -->
+                </div>
+
+                <!-- Feedback Banner -->
+                <div id="quizFeedbackBox" class="hidden p-4 rounded-2xl text-sm font-bold flex items-center justify-between">
+                    <span id="quizFeedbackText"></span>
+                    <button onclick="nextQuestion()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-4 py-2 rounded-xl font-bold shadow">
+                        Lanjut <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Result & Certificate Display Area -->
+            <div id="quizResultView" class="hidden max-w-3xl mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-amber-200 text-center space-y-6">
+                <div class="space-y-2">
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Hasil Akhir Evaluasi</span>
+                    <h2 class="text-3xl font-extrabold text-slate-800">Selamat! Kamu Telah Menyelesaikan Kuis!</h2>
+                    <p class="text-slate-600 text-sm">Berikut adalah rekap capaian belajar kamu:</p>
+                </div>
+
+                <!-- Score Display Circle -->
+                <div class="w-36 h-36 bg-gradient-to-tr from-amber-400 to-yellow-300 text-amber-950 rounded-full flex flex-col items-center justify-center mx-auto shadow-inner border-4 border-white">
+                    <span class="text-xs font-bold uppercase tracking-wider">Skor Kamu</span>
+                    <span id="finalScoreDisplay" class="text-4xl font-extrabold">100</span>
+                    <span class="text-xs font-medium">/ 100 Poin</span>
+                </div>
+
+                <!-- Input Student Name for Certificate -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 max-w-md mx-auto space-y-3 text-left">
+                    <label class="block text-xs font-bold text-slate-700 uppercase">Masukkan Nama Lengkap Siswa:</label>
+                    <input type="text" id="studentNameInput" placeholder="Contoh: Ahmad Fauzi" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-800">
+                    <label class="block text-xs font-bold text-slate-700 uppercase">Nama Sekolah / Kelas:</label>
+                    <input type="text" id="schoolNameInput" value="MIS Al Jihad Palangka Raya - Kelas 6" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-xs font-semibold text-slate-700">
+
+                    <button onclick="generateCertificateCanvas()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-award"></i> Buat Sertifikat Digital
+                    </button>
+                </div>
+
+                <!-- Certificate Canvas Preview Container -->
+                <div id="certificatePreviewArea" class="hidden space-y-4 pt-4 border-t border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-certificate text-amber-500"></i> Sertifikat Kelulusan Siswa
+                    </h3>
+                    <div class="overflow-x-auto p-2 bg-slate-100 rounded-2xl">
+                        <canvas id="certCanvas" width="900" height="630" class="w-full max-w-2xl mx-auto rounded-xl shadow-lg border border-slate-300"></canvas>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button onclick="downloadCertificate()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-2.5 rounded-xl shadow text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Unduh Gambar (PNG)
+                        </button>
+                        <button onclick="printCertificate()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-6 py-2.5 rounded-xl shadow text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> Cetak Sertifikat
+                        </button>
+                        <button onclick="startQuiz()" class="bg-teal-100 hover:bg-teal-200 text-teal-800 font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-right"></i> Ulangi Kuis
+                        </button>
+                    </div>
+
+                    <!-- GOOGLE DRIVE SUBMISSION SECTION -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-3xl p-5 sm:p-6 text-left max-w-2xl mx-auto space-y-3 mt-6 shadow-md">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 font-bold text-blue-900 text-base">
+                                <i class="fa-solid fa-cloud-arrow-up text-blue-600 text-xl"></i> Pengumpulan Sertifikat (Google Drive)
+                            </div>
+                            <span class="text-[10px] bg-blue-200 text-blue-900 font-extrabold px-2.5 py-1 rounded-full uppercase">Langkah Pengumpulan</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            <strong class="text-slate-800">Petunjuk Pengumpulan Tugas:</strong><br>
+                            1. Klik tombol <span class="text-amber-700 font-bold">Unduh Gambar (PNG)</span> di atas untuk menyimpan file sertifikat ke HP/Laptop.<br>
+                            2. Klik tombol <span class="text-blue-700 font-bold">Buka Google Drive Pengumpulan</span> di bawah.<br>
+                            3. Upload/unggah file sertifikat PNG yang sudah diunduh ke folder tersebut.
+                        </p>
+
+                        <div class="space-y-2 pt-1">
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase">Link Folder Google Drive (Dapat Diubah Guru/Siswa):</label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="url" id="gdriveUrlInput" oninput="updateGDriveLinkHref()" value="https://drive.google.com/drive/folders/1zAORn4h60iP_4ODd3Ec8NfjhHG6Yuddj" placeholder="https://drive.google.com/drive/folders/..." class="flex-grow text-xs px-3.5 py-2.5 border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500 font-medium text-slate-800 bg-white shadow-sm">
+                                <a id="gdriveSubmitLink" href="https://drive.google.com/drive/folders/1zAORn4h60iP_4ODd3Ec8NfjhHG6Yuddj" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition whitespace-nowrap">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Drive
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-center text-xs mt-10">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-bold text-slate-200 text-sm">Media Pembelajaran IPAS Interaktif &copy; MIS Al Jihad Palangka Raya</p>
+            <p>Berdasarkan Kurikulum IPAS Kelas VI SD/MI - Materi Sistem Pencernaan & Zat Nutrisi Makanan</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data Structure for Digestive System
+        const organData = [
+            {
+                id: 'mulut',
+                number: 1,
+                name: 'Mulut',
+                icon: 'fa-teeth-open',
+                badge: 'Pencernaan Mekanik & Kimiawi',
+                summary: 'Tempat awal makanan masuk dan dikunyah.',
+                mechanic: 'Pencernaan MEKANIK (Gigi & Lidah meremukkan makanan).',
+                chemical: 'Pencernaan KIMIAWI (Enzim Ptialin / Amilase dalam Air Liur memecah karbohidrat).',
+                details: [
+                    'Gigi Seri memotong, Gigi Taring merobek, Gigi Geraham mengunyah.',
+                    'Lidah membolak-balikkan makanan dan membantu menelan.',
+                    'Air Liur (Saliva) melicinkan makanan agar mudah ditelan.'
+                ],
+                audio: 'Di mulut, makanan mengalami pencernaan mekanik oleh gigi dan lidah, serta pencernaan kimiawi oleh enzim ptialin dalam air liur untuk memecah karbohidrat.'
+            },
+            {
+                id: 'kerongkongan',
+                number: 2,
+                name: 'Kerongkongan (Esofagus)',
+                icon: 'fa-arrow-down-wide-short',
+                badge: 'Gerakan Peristaltik',
+                summary: 'Saluran penghubung mulut ke lambung.',
+                mechanic: 'Gerakan PERISTALTIK (Meremas dan mendorong makanan menuju lambung).',
+                chemical: 'Katup epiglotis menutup saluran pernapasan saat menelan.',
+                details: [
+                    'Menghubungkan rongga mulut dengan organ lambung.',
+                    'Panjangnya sekitar 20 cm.',
+                    'Tips penting: Hindari berbicara saat makan agar tidak tersedak!'
+                ],
+                audio: 'Kerongkongan menghubungkan mulut ke lambung. Di sini terjadi gerakan peristaltik, yaitu gerakan meremas dan mendorong makanan turun ke lambung.'
+            },
+            {
+                id: 'lambung',
+                number: 3,
+                name: 'Lambung',
+                icon: 'fa-fill-drip',
+                badge: 'Pencernaan Kimiawi & Asam Lambung',
+                summary: 'Kantung pembunuh kuman dan pengaduk makanan.',
+                mechanic: 'Dinding lambung mengaduk makanan hingga menjadi bubur halus (Chyme).',
+                chemical: 'Enzim Pepsin, Renin, dan Asam Lambung (HCl).',
+                details: [
+                    'Asam Lambung (HCl) membunuh kuman berbahaya pada makanan.',
+                    'Enzim Pepsin mengubah protein menjadi pepton.',
+                    'Enzim Renin mengendapkan protein susu (kasein).'
+                ],
+                audio: 'Di lambung, makanan diaduk hingga halus seperti bubur. Asam lambung membunuh kuman berbahaya, sedangkan enzim pepsin dan renin mencerna protein.'
+            },
+            {
+                id: 'usushalus',
+                number: 4,
+                name: 'Usus Halus',
+                icon: 'fa-spaghetti-monster-flying',
+                badge: 'Penyerapan Sari-Sari Makanan',
+                summary: 'Pusat penyerapan nutrisi ke dalam darah.',
+                mechanic: 'Terdiri dari 3 bagian: Duodenum (12 jari), Jejunum (kosong), dan Ileum (penyerapan).',
+                chemical: 'Dibantu Getah Pankreas (Amilase, Protease, Lipase) & Getah Empedu.',
+                details: [
+                    'Terdapat Vili (jonjot usus) untuk memperluas bidang penyerapan nutrisi.',
+                    'Sari-sari makanan diserap dan dialirkan ke seluruh tubuh oleh darah.',
+                    'Panjang usus halus manusia bisa mencapai 6 hingga 7 meter!'
+                ],
+                audio: 'Usus halus adalah tempat penyerapan sari-sari makanan ke dalam aliran darah. Dibantu enzim pankreas dan empedu, terdapat jonjot vili untuk menyerap nutrisi secara optimal.'
+            },
+            {
+                id: 'ususbesar',
+                number: 5,
+                name: 'Usus Besar (Kolon)',
+                icon: 'fa-disease',
+                badge: 'Pembusukan & Penyerapan Air',
+                summary: 'Pengatur kadar air dan pembusukan sisa makanan.',
+                mechanic: 'Menyerap air dan mineral dari sisa makanan yang tidak dicerna.',
+                chemical: 'Dibantu Bakteri E. Coli (Escherichia coli).',
+                details: [
+                    'Bakteri baik E. Coli membusukkan sisa makanan menjadi kotoran (feses).',
+                    'Mengatur kadar air sisa makanan agar tidak terlalu cair/keras.',
+                    'Membentuk Vitamin K melalui aktivitas bakteri usus.'
+                ],
+                audio: 'Usus besar menyerap sisa air dan mineral. Di sini, bakteri baik E. Coli membantu membusukkan sisa makanan menjadi feses.'
+            },
+            {
+                id: 'anus',
+                number: 6,
+                name: 'Anus',
+                icon: 'fa-arrow-up-from-bracket',
+                badge: 'Pengeluaran Feses',
+                summary: 'Muara akhir pencernaan tubuh.',
+                mechanic: 'Otot spingter mengontrol pengeluaran feses dari tubuh.',
+                chemical: 'Bagian terakhir dari seluruh saluran pencernaan.',
+                details: [
+                    'Sisa makanan yang membusuk dikeluarkan dalam bentuk feses (kotoran).',
+                    'Menjaga kebersihan setelah buang air sangat penting untuk kesehatan.'
+                ],
+                audio: 'Anus adalah saluran terakhir tempat keluarnya sisa makanan atau feses dari dalam tubuh.'
+            }
+        ];
+
+        // Data for 6 Nutrients
+        const nutrientsData = [
+            {
+                title: '1. Karbohidrat',
+                icon: 'fa-wheat-awn',
+                color: 'amber',
+                meaning: 'Sumber energi utama tubuh untuk beraktivitas.',
+                benefits: 'Memberi tenaga untuk belajar, bermain, dan berolahraga.',
+                deficiency: 'Tubuh lemas, cepat lelah, dan sulit berkonsentrasi.',
+                sources: 'Nasi, roti, jagung, kentang, singkong, ubi.',
+                audioText: 'Karbohidrat adalah sumber energi utama tubuh. Jika kekurangan karbohidrat, tubuh terasa lemas dan sulit konsentrasi. Contohnya nasi, roti, jagung, dan kentang.'
+            },
+            {
+                title: '2. Protein',
+                icon: 'fa-drumstick-bite',
+                color: 'orange',
+                meaning: 'Zat pembangun dan perbaikan jaringan tubuh.',
+                benefits: 'Membantu pertumbuhan otot, mengganti sel-sel tubuh yang rusak.',
+                deficiency: 'Pertumbuhan terhambat, otot lemah, mudah sakit.',
+                sources: 'Ikan, telur, ayam, daging, tempe, tahu, susu.',
+                audioText: 'Protein berfungsi sebagai zat pembangun tubuh untuk merawat otot dan sel yang rusak. Sumbernya adalah ikan, telur, daging, tahu, dan tempe.'
+            },
+            {
+                title: '3. Lemak',
+                icon: 'fa-bacon',
+                color: 'yellow',
+                meaning: 'Cadangan energi dan pelindung organ dalam.',
+                benefits: 'Menjaga suhu tubuh tetap hangat & membantu penyerapan Vitamin A, D, E, K.',
+                deficiency: 'Berat badan turun drastis, tubuh mudah kedinginan, kulit kering.',
+                sources: 'Alpukat, kacang-kacangan, keju, minyak, ikan salmon.',
+                audioText: 'Lemak menjadi cadangan energi dan pelindung organ tubuh. Lemak juga membantu menyerap vitamin A, D, E, dan K. Contohnya alpukat, kacang, dan keju.'
+            },
+            {
+                title: '4. Vitamin (A-K)',
+                icon: 'fa-apple-whole',
+                color: 'purple',
+                meaning: 'Zat pengatur yang menjaga kesehatan organ tubuh.',
+                benefits: 'Meningkatkan daya tahan tubuh dan daya ingat.',
+                deficiency: 'Mudah terserang penyakit, luka lambat sembuh.',
+                sources: 'Buah-buahan segar dan sayuran hijau.',
+                audioText: 'Vitamin adalah zat pengatur tubuh agar tetap sehat dan terhindar dari penyakit. Sumber utamanya adalah buah-buahan dan sayuran.'
+            },
+            {
+                title: '5. Mineral',
+                icon: 'fa-bottle-droplet',
+                color: 'blue',
+                meaning: 'Zat yang dibutuhkan tubuh dalam jumlah sedikit tapi penting.',
+                benefits: 'Membentuk tulang, gigi, darah, serta menjaga fungsi saraf.',
+                deficiency: 'Tulang rapuh (osteoporosis), anemia, kram otot.',
+                sources: 'Susu, bayam, garam beryodium, pisang, ikan.',
+                audioText: 'Mineral membantu pembentukan tulang, gigi, dan sel darah. Contoh mineral adalah kalsium, zat besi, dan yodium.'
+            },
+            {
+                title: '6. Air',
+                icon: 'fa-glass-water',
+                color: 'cyan',
+                meaning: 'Cairan vital yang paling banyak mengisi tubuh kita.',
+                benefits: 'Mengatur suhu tubuh, melancarkan pencernaan, mengangkut zat gizi.',
+                deficiency: 'Dehidrasi, lemas, pusing, gangguan fungsi ginjal.',
+                sources: 'Air putih, buah semangka, melon, mentimun.',
+                audioText: 'Air mengangkut zat makanan dan mengatur suhu tubuh. Minumlah air putih yang cukup setiap hari agar terhindar dari dehidrasi!'
+            }
+        ];
+
+        // Data for Vitamins A-K
+        const vitaminData = [
+            {
+                code: 'Vit A',
+                name: 'Vitamin A',
+                icon: 'fa-eye',
+                color: 'amber',
+                benefit: 'Menjaga kesehatan mata, kulit, dan daya tahan tubuh.',
+                deficiency: 'Mata rabun senja, kulit kering, mudah sakit.',
+                food: 'Wortel, hati ayam, bayam, telur, ubi jalar, pepaya.',
+                audio: 'Vitamin A bermanfaat untuk menjaga kesehatan mata dan kulit. Contoh makanannya wortel, pepaya, dan bayam.'
+            },
+            {
+                code: 'Vit B',
+                name: 'Vitamin B (Kompleks)',
+                icon: 'fa-bolt',
+                color: 'emerald',
+                benefit: 'Mengubah makanan jadi energi, menjaga saraf & sel darah.',
+                deficiency: 'Lemas, cepat lelah, sariawan, anemia, nafsu makan turun.',
+                food: 'Beras merah, daging, kacang-kacangan, susu, roti gandum.',
+                audio: 'Vitamin B kompleks mengubah makanan menjadi energi dan menjaga saraf. Sumbernya beras merah, kacang, dan susu.'
+            },
+            {
+                code: 'Vit C',
+                name: 'Vitamin C',
+                icon: 'fa-shield-halved',
+                color: 'rose',
+                benefit: 'Meningkatkan daya tahan tubuh & penyembuhan luka.',
+                deficiency: 'Sariawan, gusi berdarah, luka lama sembuh, mudah flu.',
+                food: 'Jeruk, jambu biji, stroberi, brokoli, tomat.',
+                audio: 'Vitamin C menjaga daya tahan tubuh dan mempercepat sembuhnya luka. Contohnya jeruk, stroberi, dan brokoli.'
+            },
+            {
+                code: 'Vit D',
+                name: 'Vitamin D',
+                icon: 'fa-sun',
+                color: 'sky',
+                benefit: 'Membantu penyerapan kalsium untuk tulang & gigi kuat.',
+                deficiency: 'Tulang rapuh (rakitis pada anak), gigi mudah rusak.',
+                food: 'Ikan salmon/sarden, telur, susu, sinar matahari pagi.',
+                audio: 'Vitamin D menguatkan tulang dan gigi dengan bantuan kalsium. Berjemur matahari pagi sangat baik untuk pembentukan Vitamin D.'
+            },
+            {
+                code: 'Vit E',
+                name: 'Vitamin E',
+                icon: 'fa-leaf',
+                color: 'purple',
+                benefit: 'Melindungi sel tubuh dari kerusakan (Antioksidan).',
+                deficiency: 'Kulit kering, mudah memar, gangguan kesuburan.',
+                food: 'Kacang almond, biji bunga matahari, alpukat, minyak sayur.',
+                audio: 'Vitamin E menjaga kesehatan kulit dan melindungi sel tubuh dari kerusakan. Sumbernya kacang almond dan alpukat.'
+            },
+            {
+                code: 'Vit K',
+                name: 'Vitamin K',
+                icon: 'fa-droplet',
+                color: 'teal',
+                benefit: 'Membantu proses pembekuan darah saat terjadi luka.',
+                deficiency: 'Darah sulit membeku saat terluka (pendarahan lama).',
+                food: 'Bayam, brokoli, kubis, kedelai, hati ayam.',
+                audio: 'Vitamin K sangat penting untuk membantu pembekuan darah saat kita terluka. Banyak terdapat pada bayam dan brokoli.'
+            }
+        ];
+
+        // Quiz Questions Data
+        const quizQuestions = [
+            {
+                q: 'Proses pencernaan mekanik di dalam mulut dilakukan oleh...',
+                options: ['Air liur dan Enzim Ptialin', 'Gigi dan Lidah', 'Asam Lambung', 'Bakteri E. Coli'],
+                answer: 1,
+                explain: 'Pencernaan mekanik di mulut dilakukan oleh gigi dan lidah untuk meremukkan makanan.'
+            },
+            {
+                q: 'Gerakan meremas dan mendorong makanan di kerongkongan menuju lambung disebut gerakan...',
+                options: ['Peristaltik', 'Kimiawi', 'Diastolik', 'Sirkulasi'],
+                answer: 0,
+                explain: 'Gerakan meremas dan mendorong makanan pada esofagus disebut gerakan peristaltik.'
+            },
+            {
+                q: 'Organ pencernaan yang menghasilkan Asam Lambung (HCl) untuk membunuh kuman adalah...',
+                options: ['Usus Halus', 'Kerongkongan', 'Lambung', 'Anus'],
+                answer: 2,
+                explain: 'Lambung menghasilkan Asam Lambung (HCl) untuk membunuh kuman berbahaya pada makanan.'
+            },
+            {
+                q: 'Penyerapan sari-sari makanan ke dalam aliran darah terutama terjadi di bagian...',
+                options: ['Usus Besar', 'Usus Halus (Vili)', 'Lambung', 'Mulut'],
+                answer: 1,
+                explain: 'Sari-sari makanan diserap oleh jonjot usus (vili) yang ada di Usus Halus.'
+            },
+            {
+                q: 'Bakteri baik yang membantu proses pembusukan sisa makanan di Usus Besar adalah...',
+                options: ['Salmonella', 'Escherichia coli (E. Coli)', 'Lactobacillus', 'Amoeba'],
+                answer: 1,
+                explain: 'Bakteri E. Coli bertugas membusukkan sisa makanan menjadi feses di usus besar.'
+            },
+            {
+                q: 'Zat makanan yang berfungsi sebagai sumber energi utama bagi tubuh kita adalah...',
+                options: ['Protein', 'Karbohidrat', 'Vitamin', 'Mineral'],
+                answer: 1,
+                explain: 'Karbohidrat (nasi, roti, kentang) adalah sumber energi utama tubuh.'
+            },
+            {
+                q: 'Jika seseorang sering mengalami gusi berdarah dan sariawan, ia kemungkinan kekurangan...',
+                options: ['Vitamin A', 'Vitamin B', 'Vitamin C', 'Vitamin D'],
+                answer: 2,
+                explain: 'Sariawan dan gusi berdarah disebabkan oleh kekurangan Vitamin C.'
+            },
+            {
+                q: 'Vitamin yang bermanfaat membantu pembekuan darah saat terluka adalah...',
+                options: ['Vitamin K', 'Vitamin E', 'Vitamin A', 'Vitamin D'],
+                answer: 0,
+                explain: 'Vitamin K berperan penting dalam proses pembekuan darah.'
+            },
+            {
+                q: 'Zat makanan yang berguna sebagai pembangun tubuh dan merawat jaringan yang rusak adalah...',
+                options: ['Protein', 'Lemak', 'Karbohidrat', 'Air'],
+                answer: 0,
+                explain: 'Protein (ikan, telur, tahu, tempe) berfungsi sebagai zat pembangun tubuh.'
+            },
+            {
+                q: 'Berjemur di bawah sinar matahari pagi dapat membantu tubuh kita membentuk...',
+                options: ['Vitamin A', 'Vitamin B', 'Vitamin C', 'Vitamin D'],
+                answer: 3,
+                explain: 'Sinar matahari pagi membantu merangsang pembentukan Vitamin D untuk kesehatan tulang.'
+            }
+        ];
+
+        let ttsEnabled = true;
+        let globalStarsCount = 0;
+        let selectedOrganId = 'mulut';
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let userQuizAnswers = [];
+        let synth = window.speechSynthesis;
+
+        // Initialize Web Application
+        window.onload = function() {
+            renderOrganList();
+            renderOrganDetail('mulut');
+            renderNutrients();
+            renderVitamins('all');
+            renderVitaminFilterBtns();
+            updateGDriveLinkHref();
+        };
+
+        // Navigation Tab Switching
+        function switchTab(tabId) {
+            stopAudioSpeech();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-emerald-800', 'shadow');
+                el.classList.add('text-white', 'hover:bg-white/10');
+            });
+
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`tab-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-white', 'text-emerald-800', 'shadow');
+                activeNav.classList.remove('hover:bg-white/10', 'text-white');
+            }
+        }
+
+        function toggleAudioSpeech() {
+            ttsEnabled = !ttsEnabled;
+            const icon = document.getElementById('ttsIcon');
+            const text = document.getElementById('ttsText');
+
+            if (ttsEnabled) {
+                icon.className = "fa-solid fa-volume-high text-amber-300 text-base";
+                text.innerText = "Suara: ON";
+                speakText("Suara pengajar diaktifkan.");
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-slate-300 text-base";
+                text.innerText = "Suara: OFF";
+                stopAudioSpeech();
+            }
+        }
+
+        function speakText(text) {
+            if (!ttsEnabled || !text) return;
+
+            stopAudioSpeech();
+
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID'; // Indonesian Language Code
+                utterance.rate = 0.95; // Slightly clear and calm speech rate
+                utterance.pitch = 1.05;
+
+                const statusBanner = document.getElementById('audioStatusBanner');
+                const statusText = document.getElementById('audioPlayingText');
+
+                statusText.innerText = `Memutar: "${text.substring(0, 45)}..."`;
+                statusBanner.classList.remove('hidden');
+
+                utterance.onend = function() {
+                    statusBanner.classList.add('hidden');
+                };
+
+                utterance.onerror = function() {
+                    statusBanner.classList.add('hidden');
+                };
+
+                synth.speak(utterance);
+            }
+        }
+
+        function stopAudioSpeech() {
+            if ('speechSynthesis' in window && synth) {
+                synth.cancel();
+            }
+            const statusBanner = document.getElementById('audioStatusBanner');
+            if (statusBanner) statusBanner.classList.add('hidden');
+        }
+
+        function renderOrganList() {
+            const container = document.getElementById('organButtonsList');
+            container.innerHTML = organData.map(organ => `
+                <button onclick="selectOrgan('${organ.id}')" id="btn-organ-${organ.id}" class="organ-btn w-full p-3.5 rounded-2xl border-2 transition flex items-center justify-between text-left ${organ.id === selectedOrganId ? 'bg-emerald-600 text-white border-emerald-600 shadow-md scale-[1.01]' : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50'}">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl ${organ.id === selectedOrganId ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'} font-black text-sm flex items-center justify-center flex-shrink-0">
+                            ${organ.number}
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-sm leading-tight">${organ.name}</h4>
+                            <p class="text-[11px] ${organ.id === selectedOrganId ? 'text-emerald-100' : 'text-slate-500'} line-clamp-1">${organ.badge}</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-70"></i>
+                </button>
+            `).join('');
+        }
+
+        function selectOrgan(id) {
+            selectedOrganId = id;
+            renderOrganList();
+            renderOrganDetail(id);
+            addStarPoint(1);
+        }
+
+        function renderOrganDetail(id) {
+            const organ = organData.find(o => o.id === id);
+            if (!organ) return;
+
+            const box = document.getElementById('organDetailBox');
+            box.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid ${organ.icon}"></i>
+                            </div>
+                            <div>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Langkah Ke-${organ.number}</span>
+                                <h3 class="text-2xl font-extrabold text-slate-800">${organ.name}</h3>
+                            </div>
+                        </div>
+                        <button onclick="speakText('${organ.audio}')" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow transition">
+                            <i class="fa-solid fa-volume-high text-sm"></i> Putar Penjelasan
+                        </button>
+                    </div>
+
+                    <p class="text-slate-600 text-sm italic bg-slate-50 p-3 rounded-xl border-l-4 border-emerald-500">
+                        "${organ.summary}"
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-teal-50/80 border border-teal-200 p-4 rounded-2xl space-y-1">
+                            <h5 class="text-xs font-bold text-teal-900 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-gear text-teal-600"></i> Proses Mekanik:
+                            </h5>
+                            <p class="text-xs text-teal-950 font-medium">${organ.mechanic}</p>
+                        </div>
+                        <div class="bg-cyan-50/80 border border-cyan-200 p-4 rounded-2xl space-y-1">
+                            <h5 class="text-xs font-bold text-cyan-900 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-flask text-cyan-600"></i> Proses Kimiawi:
+                            </h5>
+                            <p class="text-xs text-cyan-950 font-medium">${organ.chemical}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Fakta Penting Organ Ini:</h4>
+                        <ul class="space-y-2">
+                            ${organ.details.map(detail => `
+                                <li class="text-xs sm:text-sm text-slate-700 flex items-start gap-2 bg-emerald-50/50 p-2.5 rounded-xl">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 text-base mt-0.5"></i>
+                                    <span>${detail}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-xs">
+                    <span class="text-slate-400 font-semibold">IPAS SD Kelas VI</span>
+                    <button onclick="navigateOrgan(1)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-1 transition shadow">
+                        Organ Berikutnya <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            `;
+
+            // Auto read when organ selected
+            speakText(organ.audio);
+        }
+
+        function navigateOrgan(direction) {
+            const currentIndex = organData.findIndex(o => o.id === selectedOrganId);
+            const nextIndex = (currentIndex + direction) % organData.length;
+            selectOrgan(organData[nextIndex].id);
+        }
+
+        function renderNutrients() {
+            const grid = document.getElementById('nutrientsGrid');
+            grid.innerHTML = nutrientsData.map(item => `
+                <div class="bg-white rounded-3xl p-6 shadow-lg border-2 border-slate-100 hover:border-blue-300 transition duration-300 flex flex-col justify-between space-y-4 organ-card">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid ${item.icon}"></i>
+                            </div>
+                            <button onclick="speakText('${item.audioText}')" class="text-xs bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-800 px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-volume-high text-xs"></i> Suara
+                            </button>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800">${item.title}</h3>
+                        <p class="text-xs font-semibold text-blue-800 bg-blue-50 p-2.5 rounded-xl">${item.meaning}</p>
+
+                        <div class="space-y-2 text-xs">
+                            <div>
+                                <span class="font-bold text-emerald-700"><i class="fa-solid fa-circle-plus"></i> Manfaat:</span>
+                                <p class="text-slate-600">${item.benefits}</p>
+                            </div>
+                            <div>
+                                <span class="font-bold text-rose-600"><i class="fa-solid fa-triangle-exclamation"></i> Akibat Kekurangan:</span>
+                                <p class="text-slate-600">${item.deficiency}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 bg-slate-50 p-3 rounded-2xl">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase block mb-1">Contoh Makanan:</span>
+                        <p class="text-xs font-bold text-slate-800">${item.sources}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderVitaminFilterBtns() {
+            const container = document.getElementById('vitaminFilterBtns');
+            const vitCodes = ['all', 'Vit A', 'Vit B', 'Vit C', 'Vit D', 'Vit E', 'Vit K'];
+            container.innerHTML = vitCodes.map(code => `
+                <button onclick="renderVitamins('${code}')" class="px-4 py-2 rounded-2xl font-bold text-xs transition border ${code === 'all' ? 'bg-purple-600 text-white border-purple-600 shadow' : 'bg-white text-slate-700 border-slate-200 hover:bg-purple-50'}">
+                    ${code === 'all' ? 'Semua Vitamin' : code}
+                </button>
+            `).join('');
+        }
+
+        function renderVitamins(filterCode) {
+            const grid = document.getElementById('vitaminsGrid');
+            const filtered = filterCode === 'all' ? vitaminData : vitaminData.filter(v => v.code === filterCode);
+
+            grid.innerHTML = filtered.map(v => `
+                <div class="bg-white rounded-3xl p-6 shadow-lg border-2 border-slate-100 hover:border-purple-300 transition duration-300 flex flex-col justify-between space-y-4 organ-card">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-purple-100 text-purple-900 font-extrabold text-xs px-3 py-1 rounded-full uppercase">${v.code}</span>
+                            <button onclick="speakText('${v.audio}')" class="text-xs bg-purple-50 hover:bg-purple-100 text-purple-800 px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-volume-high text-xs"></i> Suara
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-purple-100 text-purple-700 rounded-xl flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid ${v.icon}"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-slate-800">${v.name}</h3>
+                        </div>
+
+                        <div class="space-y-2 text-xs">
+                            <div class="bg-emerald-50 p-2.5 rounded-xl">
+                                <span class="font-bold text-emerald-800"><i class="fa-solid fa-shield text-xs"></i> Manfaat Utama:</span>
+                                <p class="text-slate-700 mt-0.5">${v.benefit}</p>
+                            </div>
+                            <div class="bg-rose-50 p-2.5 rounded-xl">
+                                <span class="font-bold text-rose-800"><i class="fa-solid fa-circle-xmark text-xs"></i> Akibat Kekurangan:</span>
+                                <p class="text-slate-700 mt-0.5">${v.deficiency}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 bg-purple-50/50 p-3 rounded-2xl">
+                        <span class="text-[11px] font-bold text-purple-900 uppercase block mb-1">Contoh Makanan Kaya ${v.code}:</span>
+                        <p class="text-xs font-bold text-slate-800">${v.food}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            userQuizAnswers = [];
+
+            document.getElementById('quizStartView').classList.add('hidden');
+            document.getElementById('quizResultView').classList.add('hidden');
+            document.getElementById('quizActiveView').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('currentQuestionNum').innerText = currentQuizIndex + 1;
+            document.getElementById('quizProgressBar').style.width = `${((currentQuizIndex + 1) / quizQuestions.length) * 100}%`;
+            document.getElementById('quizScoreText').innerText = quizScore;
+
+            document.getElementById('quizQuestionText').innerText = `${currentQuizIndex + 1}. ${q.q}`;
+
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            feedbackBox.classList.add('hidden');
+
+            const container = document.getElementById('quizOptionsContainer');
+            container.innerHTML = q.options.map((opt, idx) => `
+                <button onclick="selectAnswer(${idx})" class="quiz-opt-btn w-full p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left font-semibold text-sm text-slate-700 transition flex items-center justify-between">
+                    <span>${String.fromCharCode(65 + idx)}. ${opt}</span>
+                    <i class="fa-regular fa-circle text-slate-300"></i>
+                </button>
+            `).join('');
+
+            speakText(`Soal nomor ${currentQuizIndex + 1}: ${q.q}`);
+        }
+
+        function readCurrentQuestionAudio() {
+            const q = quizQuestions[currentQuizIndex];
+            const optsText = q.options.map((o, i) => `Pilihan ${String.fromCharCode(65 + i)}: ${o}`).join('. ');
+            speakText(`Soal: ${q.q}. ${optsText}`);
+        }
+
+        function selectAnswer(selectedIdx) {
+            const q = quizQuestions[currentQuizIndex];
+            const isCorrect = selectedIdx === q.answer;
+
+            // Disable option buttons
+            const buttons = document.querySelectorAll('.quiz-opt-btn');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === q.answer) {
+                    btn.className = "w-full p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-100 text-emerald-950 font-bold text-sm text-left flex items-center justify-between shadow";
+                    btn.innerHTML += `<i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>`;
+                } else if (idx === selectedIdx && !isCorrect) {
+                    btn.className = "w-full p-4 rounded-2xl border-2 border-rose-400 bg-rose-100 text-rose-950 font-bold text-sm text-left flex items-center justify-between";
+                    btn.innerHTML += `<i class="fa-solid fa-circle-xmark text-rose-600 text-lg"></i>`;
+                }
+            });
+
+            if (isCorrect) {
+                quizScore += 10;
+                addStarPoint(10);
+                playBeepSound(true);
+            } else {
+                playBeepSound(false);
+            }
+
+            // Show feedback
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            const feedbackText = document.getElementById('quizFeedbackText');
+
+            feedbackBox.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-900', 'bg-rose-100', 'text-rose-900');
+            if (isCorrect) {
+                feedbackBox.classList.add('bg-emerald-100', 'text-emerald-900');
+                feedbackText.innerText = "Jawaban Benar! +10 Poin";
+                speakText("Hebat! Jawaban kamu benar!");
+            } else {
+                feedbackBox.classList.add('bg-rose-100', 'text-rose-900');
+                feedbackText.innerText = `Kurang Tepat. ${q.explain}`;
+                speakText(`Kurang tepat. ${q.explain}`);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizActiveView').classList.add('hidden');
+            document.getElementById('quizResultView').classList.remove('hidden');
+
+            document.getElementById('finalScoreDisplay').innerText = quizScore;
+
+            if (quizScore >= 70) {
+                confetti({
+                    particleCount: 120,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                speakText(`Selamat! Kamu lulus kuis dengan nilai ${quizScore}! Masukkan namamu untuk membuat sertifikat kelulusan.`);
+            } else {
+                speakText(`Kamu mendapatkan skor ${quizScore}. Jangan berkecil hati, pelajari materi lagi dan ulangi kuis!`);
+            }
+        }
+
+        function generateCertificateCanvas() {
+            const name = document.getElementById('studentNameInput').value.trim() || 'Siswa Terbaik IPAS';
+            const school = document.getElementById('schoolNameInput').value.trim() || 'MIS Al Jihad Palangka Raya';
+
+            const canvas = document.getElementById('certCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Draw Background Frame
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Decorative Outer Border
+            ctx.strokeStyle = '#0D9488'; // Emerald
+            ctx.lineWidth = 12;
+            ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
+
+            ctx.strokeStyle = '#F59E0B'; // Gold border
+            ctx.lineWidth = 4;
+            ctx.strokeRect(26, 26, canvas.width - 52, canvas.height - 52);
+
+            // Corner Ornaments
+            drawCornerPattern(ctx, 35, 35);
+            drawCornerPattern(ctx, canvas.width - 35, 35);
+            drawCornerPattern(ctx, 35, canvas.height - 35);
+            drawCornerPattern(ctx, canvas.width - 35, canvas.height - 35);
+
+            // Header Title
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#0F172A';
+            ctx.font = 'bold 22px Fredoka, sans-serif';
+            ctx.fillText(school.toUpperCase(), canvas.width / 2, 85);
+
+            ctx.fillStyle = '#0D9488';
+            ctx.font = 'bold 36px Fredoka, sans-serif';
+            ctx.fillText('SERTIFIKAT KELULUSAN IPAS', canvas.width / 2, 135);
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = '14px Plus Jakarta Sans, sans-serif';
+            ctx.fillText('Diberikan secara resmi kepada siswa di bawah ini:', canvas.width / 2, 175);
+
+            // Student Name
+            ctx.fillStyle = '#1E1B4B';
+            ctx.font = 'bold 38px Fredoka, sans-serif';
+            ctx.fillText(name, canvas.width / 2, 240);
+
+            // Underline name
+            ctx.strokeStyle = '#F59E0B';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2 - 180, 255);
+            ctx.lineTo(canvas.width / 2 + 180, 255);
+            ctx.stroke();
+
+            // Achievement Statement
+            ctx.fillStyle = '#334155';
+            ctx.font = '15px Plus Jakarta Sans, sans-serif';
+            ctx.fillText('Atas keberhasilannya menyelesaikan seluruh Modul Interaktif & Kuis Evaluasi', canvas.width / 2, 295);
+            ctx.fillText('Materi Sistem Pencernaan & Nutrisi Makanan Seimbang', canvas.width / 2, 320);
+
+            // Score Badge Box
+            ctx.fillStyle = '#FEF3C7';
+            ctx.beginPath();
+            ctx.roundRect(canvas.width / 2 - 120, 350, 240, 60, 15);
+            ctx.fill();
+            ctx.strokeStyle = '#F59E0B';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#78350F';
+            ctx.font = 'bold 16px Plus Jakarta Sans, sans-serif';
+            ctx.fillText(`NILAI AKHIR: ${quizScore} / 100`, canvas.width / 2, 386);
+
+            // Official Stamp Seal Simulation
+            drawStampSeal(ctx, 140, 480);
+
+            // Date & Signature Section
+            const todayDate = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            ctx.fillStyle = '#475569';
+            ctx.font = '14px Plus Jakarta Sans, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Palangka Raya, ${todayDate}`, 720, 450);
+            ctx.fillText('Guru Pengajar IPAS', 720, 470);
+
+            // Signature placeholder line
+            ctx.strokeStyle = '#94A3B8';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(630, 540);
+            ctx.lineTo(810, 540);
+            ctx.stroke();
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = 'bold 14px Plus Jakarta Sans, sans-serif';
+            ctx.fillText('MIS Al Jihad Palangka Raya', 720, 560);
+
+            document.getElementById('certificatePreviewArea').classList.remove('hidden');
+            speakText("Sertifikat digital berhasil dibuat! Jangan lupa unduh gambar sertifikat dan kumpulkan ke Google Drive.");
+        }
+
+        function drawCornerPattern(ctx, x, y) {
+            ctx.fillStyle = '#0D9488';
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawStampSeal(ctx, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 45, 0, Math.PI * 2);
+            ctx.fillStyle = '#0D9488';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 40, 0, Math.PI * 2);
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 11px Fredoka, sans-serif';
+            ctx.fillText('MIS AL JIHAD', 0, -8);
+            ctx.fillText('LULUS', 0, 8);
+            ctx.fillText('IPAS', 0, 22);
+
+            ctx.restore();
+        }
+
+        function downloadCertificate() {
+            const canvas = document.getElementById('certCanvas');
+            const link = document.createElement('a');
+            const name = document.getElementById('studentNameInput').value.trim() || 'Siswa';
+            link.download = `Sertifikat_IPAS_${name.replace(/\s+/g, '_')}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            speakText("Sertifikat berhasil diunduh! Sekarang kamu bisa mengunggahnya ke Google Drive.");
+        }
+
+        function updateGDriveLinkHref() {
+            const inputVal = document.getElementById('gdriveUrlInput').value.trim();
+            const btnLink = document.getElementById('gdriveSubmitLink');
+            if (inputVal) {
+                btnLink.href = inputVal.startsWith('http') ? inputVal : `https://${inputVal}`;
+            } else {
+                btnLink.href = 'https://drive.google.com/drive/folders/1zAORn4h60iP_4ODd3Ec8NfjhHG6Yuddj';
+            }
+        }
+
+        function printCertificate() {
+            const canvas = document.getElementById('certCanvas');
+            const dataUrl = canvas.toDataURL();
+            const windowContent = `
+                <!DOCTYPE html>
+                <html>
+                    <head><title>Cetak Sertifikat IPAS</title></head>
+                    <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f0f0f0;">
+                        <img src="${dataUrl}" style="max-width:100%; height:auto;" onload="window.print();window.close();"/>
+                    </body>
+                </html>
+            `;
+            const printWin = window.open('', '', 'width=950,height=700');
+            printWin.document.open();
+            printWin.document.write(windowContent);
+            printWin.document.close();
+        }
+
+        function addStarPoint(pts) {
+            globalStarsCount += pts;
+            document.getElementById('globalStars').innerText = `${globalStarsCount} Poin`;
+        }
+
+        function playBeepSound(isSuccess) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (isSuccess) {
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else {
+                    osc.frequency.setValueAtTime(220, ctx.currentTime); // A3
+                    osc.frequency.setValueAtTime(180, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                }
+            } catch (e) {
+                // Ignore audio context errors if muted by browser
+            }
+        }
+    </script>
+</body>
+</html>
